@@ -58,6 +58,13 @@ class RAGPipeline:
         return "\n\n---\n\n".join([doc.page_content for doc, _score in docs_with_scores])
 
     def _generate_llm_response(self, question: str, context: str, chat_history: List[Dict[str, str]] = None) -> str:
-        prompt = self.prompt_template.format(context=context, question=question)
+        # Build chat history string
+        history_text = ""
+        if chat_history:
+            for turn in chat_history:
+                role = turn.get("role", "user").capitalize()
+                content = turn.get("content", "")
+                history_text += f"{role}: {content}\n"
+        prompt = f"{history_text}\nContext:\n{context}\n\nQuestion: {question}\nAnswer:"
         response = self.llm.invoke(prompt)
         return response
