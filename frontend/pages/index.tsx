@@ -6,10 +6,11 @@ import ReactMarkdown from "react-markdown";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
 
 export default function Home() {
-  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfFiles, setPdfFiles] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+
 
   const [chatInput, setChatInput] = useState("");
   const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([]);
@@ -20,41 +21,51 @@ export default function Home() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Handle PDF file selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setPdfFile(e.target.files[0]);
-      setUploadStatus(null);
-      setUploadProgress(0);
-    }
-  };
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (e.target.files) {
+    // Append new files to the existing list, avoiding duplicates by name
+    const newFiles = Array.from(e.target.files);
+    setPdfFiles((prev) => {
+      const existingNames = new Set(prev.map(f => f.name));
+      const filteredNew = newFiles.filter(f => !existingNames.has(f.name));
+      return [...prev, ...filteredNew];
+    });
+    setUploadStatus(null);
+    setUploadProgress(0);
+  }
+};
 
   // Handle PDF upload
   const handleUpload = async () => {
-    if (!pdfFile) return;
-    setUploading(true);
-    setUploadStatus(null);
-    setUploadProgress(0);
+  if (!pdfFiles.length) return;
+  setUploading(true);
+  setUploadStatus(null);
+  setUploadProgress(0);
 
-    const formData = new FormData();
-    formData.append("file", pdfFile);
+  const formData = new FormData();
+  pdfFiles.forEach((file) => {
+    formData.append("files", file);
+  });
 
-    try {
-      const res = await fetch(`${BACKEND_URL}/api/upload`, {
-        method: "POST",
-        body: formData,
-      });
-      if (!res.ok) {
-        setUploadStatus("Upload failed");
-        setUploading(false);
-        return;
-      }
-      setUploadStatus("Upload successful");
-      setUploadProgress(100);
-    } catch (err) {
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/upload`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) {
       setUploadStatus("Upload failed");
+      setUploading(false);
+      return;
     }
-    setUploading(false);
-  };
+    const data = await res.json();
+    setUploadStatus(data);
+    setUploadProgress(100);
+    setPdfFiles([]); // Clear the list after upload finishes
+  } catch (err) {
+    setUploadStatus("Upload failed");
+  }
+  setUploading(false);
+};
 
   // Handle chat send
   const handleSend = async () => {
@@ -145,25 +156,57 @@ export default function Home() {
                 </p>
               </div>
               {/* File Upload */}
-              <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-                <label className="flex flex-col min-w-40 flex-1">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="application/pdf"
-                    className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0d141c] focus:outline-0 focus:ring-0 border border-[#cedbe8] bg-slate-50 focus:border-[#cedbe8] h-14 placeholder:text-[#49739c] p-[15px] text-base font-normal leading-normal"
-                    placeholder="Upload a financial statement (PDF)"
-                    onChange={handleFileChange}
-                  />
-                </label>
-                <button
-                  className="min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 bg-[#0c7ff2] text-slate-50 text-base font-medium leading-normal"
-                  disabled={!pdfFile || uploading}
-                  onClick={handleUpload}
-                >
-                  {uploading ? "Uploading..." : "Upload"}
-                </button>
-              </div>
+                    <div className="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+                      <label className="flex flex-col min-w-40 flex-1">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="application/pdf"
+                          multiple
+                          className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0d141c] focus:outline-0 focus:ring-0 border border-[#cedbe8] bg-slate-50 focus:border-[#cedbe8] h-14 placeholder:text-[#49739c] p-[15px] text-base font-normal leading-normal"
+                          placeholder="Upload financial statements (PDF)"
+                          onChange={handleFileChange}
+                        />
+                      </label>
+                          {pdfFiles.length > 0 && (
+                            <ul className="mb-2 space-y-2">
+                              {pdfFiles.map((file, idx) => (
+                                <li
+                                  key={file.name}
+                                  className="flex items-center justify-between bg-white border border-[#e7edf4] rounded-lg px-3 py-2 shadow-sm transition hover:shadow-md"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {/* File icon */}
+                                    <svg className="w-5 h-5 text-[#0c7ff2]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 7V3a1 1 0 011-1h8a1 1 0 011 1v18a1 1 0 01-1 1H8a1 1 0 01-1-1v-4" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M7 17l-4-4m0 0l4-4m-4 4h14" />
+                                    </svg>
+                                    <span className="text-[#0d141c] font-medium truncate max-w-[180px]">{file.name}</span>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className="ml-2 px-2 py-1 rounded hover:bg-red-100 text-red-600 transition"
+                                    title="Remove"
+                                    onClick={() =>
+                                      setPdfFiles(files => files.filter((_, i) => i !== idx))
+                                    }
+                                  >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                      <button
+                        className="min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-4 bg-[#0c7ff2] text-slate-50 text-base font-medium leading-normal"
+                        disabled={!pdfFiles.length || uploading}
+                        onClick={handleUpload}
+                      >
+                        {uploading ? "Uploading..." : "Upload"}
+                      </button>
+                    </div>
               {/* Upload Progress */}
               {uploading && (
                 <div className="flex flex-col gap-3 p-4">
@@ -181,11 +224,47 @@ export default function Home() {
                   </p>
                 </div>
               )}
-              {uploadStatus && (
-                <div className="flex flex-col gap-3 p-4">
-                  <p className="text-[#0d141c] text-base font-medium leading-normal">{uploadStatus}</p>
-                </div>
-              )}
+                {uploadStatus && (
+                  <div className="flex flex-col gap-3 p-4">
+                    <h4 className="text-[#0d141c] text-base font-semibold mb-2">Upload Results</h4>
+                    <table className="min-w-full border border-[#e7edf4] rounded-lg overflow-hidden bg-white shadow">
+                      <thead className="bg-[#f5f8fa]">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-[#49739c]">File</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-[#49739c]">Status</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-[#49739c]">Chunks</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-[#49739c]">Time (s)</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {uploadStatus.results.map((r: any, idx: number) => (
+                          <tr key={r.filename} className="border-t border-[#e7edf4]">
+                            <td className="px-4 py-2 text-sm">{r.filename}</td>
+                            <td className="px-4 py-2 text-sm">
+                              {r.message.includes("success") ? (
+                                <span className="inline-flex items-center gap-1 text-green-600">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  {r.message}
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 text-red-600">
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  {r.message}
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-4 py-2 text-sm">{r.chunks_count}</td>
+                            <td className="px-4 py-2 text-sm">{r.processing_time}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               {/* Chat Section */}
               <h3 className="text-[#0d141c] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">
                 Chat

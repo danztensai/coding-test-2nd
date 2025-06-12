@@ -38,6 +38,8 @@ class UploadResponse(BaseModel):
     chunks_count: int
     processing_time: float
 
+class MultiUploadResponse(BaseModel):
+    results: List[UploadResponse]
 
 class ChunkInfo(BaseModel):
     id: str

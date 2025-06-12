@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
 load_dotenv()
+from typing import List
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from models.schemas import ChatRequest, ChatResponse, DocumentsResponse, UploadResponse, DocumentInfo, DocumentSource, ChunkInfo, ChunksResponse
+from models.schemas import ChatRequest, ChatResponse, DocumentsResponse, UploadResponse, DocumentInfo, DocumentSource, ChunkInfo, ChunksResponse, MultiUploadResponse
 from services.pdf_processor import PDFProcessor
 from services.vector_store import VectorStoreService
 from services.rag_pipeline import RAGPipeline
@@ -50,28 +51,42 @@ async def startup_event():
 async def root():
     return {"message": "RAG-based Financial Statement Q&A System is running"}
 
-@app.post("/api/upload", response_model=UploadResponse)
-async def upload_pdf(file: UploadFile = File(...)):
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
-    save_path = os.path.join(UPLOAD_DIR, file.filename)
-    with open(save_path, "wb") as f:
-        content = await file.read()
-        f.write(content)
-    start_time = time.time()
-    try:
-        chunks = pdf_processor.process_pdf(save_path)
-        vector_store.add_documents(chunks)
-    except Exception as e:
-        logger.error(f"PDF processing or vector store add failed: {e}")
-        raise HTTPException(status_code=500, detail="Failed to process PDF.")
-    processing_time = round(time.time() - start_time, 2)
-    return UploadResponse(
-        message="File processed successfully",
-        filename=file.filename,
-        chunks_count=len(chunks),
-        processing_time=processing_time
-    )
+@app.post("/api/upload", response_model=MultiUploadResponse)
+async def upload_pdfs(files: List[UploadFile] = File(...)):
+    responses = []
+    for file in files:
+        if not file.filename.lower().endswith(".pdf"):
+            responses.append(UploadResponse(
+                message="Only PDF files are supported.",
+                filename=file.filename,
+                chunks_count=0,
+                processing_time=0
+            ))
+            continue
+        save_path = os.path.join(UPLOAD_DIR, file.filename)
+        with open(save_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+        start_time = time.time()
+        try:
+            chunks = pdf_processor.process_pdf(save_path)
+            vector_store.add_documents(chunks)
+            processing_time = round(time.time() - start_time, 2)
+            responses.append(UploadResponse(
+                message="File processed successfully",
+                filename=file.filename,
+                chunks_count=len(chunks),
+                processing_time=processing_time
+            ))
+        except Exception as e:
+            logger.error(f"PDF processing or vector store add failed: {e}")
+            responses.append(UploadResponse(
+                message="Failed to process PDF.",
+                filename=file.filename,
+                chunks_count=0,
+                processing_time=0
+            ))
+    return MultiUploadResponse(results=responses)
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest):
