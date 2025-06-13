@@ -2,7 +2,6 @@ import os
 from typing import List
 from pydantic_settings import BaseSettings
 
-
 class Settings(BaseSettings):
     # OpenAI API configuration
     openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
@@ -16,8 +15,12 @@ class Settings(BaseSettings):
     
     # Embedding model configuration
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002")
+    embedding_provider: str = os.getenv("EMBEDDING_PROVIDER", "openai")  # NEW: provider field
     
     # LLM configuration
+    llm_provider: str = os.getenv("LLM_PROVIDER", "ollama")
+    google_api_key: str = os.getenv("GOOGLE_API_KEY", "")
+    
     llm_model: str = os.getenv("LLM_MODEL", "llama3")
     ollama_base_url: str = os.getenv("LLAMA_SERVER_URL", "http://localhost:11434")
     llm_temperature: float = float(os.getenv("LLM_TEMPERATURE", "0.1"))
@@ -48,5 +51,4 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
 
-
-settings = Settings() 
+settings = Settings()

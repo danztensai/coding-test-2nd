@@ -6,8 +6,10 @@ import logging
 
 from langchain.prompts import ChatPromptTemplate
 from langchain_community.llms.ollama import Ollama
-from services.get_embedding_function import get_embedding_function
+from utils.get_embedding_function import get_embedding_function
+from utils.llm_provider import get_llm
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +29,7 @@ class RAGPipeline:
             persist_directory=settings.vector_db_path,
             embedding_function=get_embedding_function()
         )
-        self.llm = Ollama(model=getattr(settings, "llm_model", "llama3"),
-                          base_url=getattr(settings, "ollama_base_url", "http://localhost:11434"))
+        self.llm = get_llm()
         self.prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
         self.k = getattr(settings, "RETRIEVAL_TOP_K", 5)
 
@@ -58,7 +59,6 @@ class RAGPipeline:
         return "\n\n---\n\n".join([doc.page_content for doc, _score in docs_with_scores])
 
     def _generate_llm_response(self, question: str, context: str, chat_history: List[Dict[str, str]] = None) -> str:
-        # Build chat history string
         history_text = ""
         if chat_history:
             for turn in chat_history:
@@ -66,5 +66,8 @@ class RAGPipeline:
                 content = turn.get("content", "")
                 history_text += f"{role}: {content}\n"
         prompt = f"{history_text}\nContext:\n{context}\n\nQuestion: {question}\nAnswer:"
+
         response = self.llm.invoke(prompt)
-        return response
+
+        # Safely extract string
+        return getattr(response, "content", response)

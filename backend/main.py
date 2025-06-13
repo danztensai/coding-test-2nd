@@ -8,7 +8,7 @@ from models.schemas import ChatRequest, ChatResponse, DocumentsResponse, UploadR
 from services.pdf_processor import PDFProcessor
 from services.vector_store import VectorStoreService
 from services.rag_pipeline import RAGPipeline
-from services.get_embedding_function import get_embedding_function
+from utils.get_embedding_function import get_embedding_function
 from config import settings
 import logging
 import time
