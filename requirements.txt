@@ -1,29 +1,37 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-python-multipart==0.0.6
-python-jose[cryptography]==3.3.0
+# FastAPI stack
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+python-dotenv==1.0.1
+
+# PDF processing
 PyPDF2==3.0.1
-pdfplumber==0.10.0
+pdfplumber==0.11.0
 pymupdf==1.23.26
-langchain==0.1.0
-langchain-openai==0.0.2
-langchain-community==0.0.10
-openai==1.6.1
-tiktoken==0.5.2
-chromadb==0.4.18
-faiss-cpu==1.7.4
-sentence-transformers==2.2.2
-transformers==4.36.2
-torch==2.1.2
-numpy==1.24.4
-pandas==2.1.4
-python-dotenv==1.0.0
-pydantic==2.5.2
-pydantic-settings==2.1.0
-requests==2.31.0
-aiofiles==23.2.0
-tqdm==4.66.1
+
+# Embedding + LLM
+openai==1.30.5
+sentence-transformers==2.7.0
+transformers==4.41.2
+torch==2.3.0
+tiktoken==0.7.0
+
+# Vectorstore
+chromadb==0.4.24
+
+# LangChain full stack
+langchain==0.1.17
+langchain-community==0.0.36
+langchain-openai==0.1.5
+langchain-google-genai==1.0.3
+
+# Utilities
+numpy==1.26.4
+pandas==2.2.2
+pydantic==2.7.1
+pydantic-settings==2.2.1
+requests==2.32.3
+tqdm==4.66.4
 loguru==0.7.2
-pytest==7.4.3
-pytest-asyncio==0.21.1
-httpx==0.25.2 
+
+ollama==0.1.8

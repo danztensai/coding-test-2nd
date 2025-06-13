@@ -66,8 +66,5 @@ class RAGPipeline:
                 content = turn.get("content", "")
                 history_text += f"{role}: {content}\n"
         prompt = f"{history_text}\nContext:\n{context}\n\nQuestion: {question}\nAnswer:"
-
         response = self.llm.invoke(prompt)
-
-        # Safely extract string
         return getattr(response, "content", response)
