@@ -11,7 +11,7 @@ export default function Home() {
   const [uploadStatus, setUploadStatus] = useState<any>(null);
 
   const [chatInput, setChatInput] = useState("");
-  // Initialize with a welcome message from the assistant
+  // Initialize chat with welcome message
   const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([
     {
       role: "assistant",
@@ -260,22 +260,36 @@ export default function Home() {
                 </button>
               </div>
               {/* Upload Progress */}
-              {uploading && (
-                <div className="flex flex-col gap-3 p-4">
-                  <div className="flex gap-6 justify-between">
+                {uploading && (
+                <div className="flex flex-col gap-3 p-4 items-center">
+                  <div className="flex gap-6 justify-between w-full">
                     <p className="text-[#0d141c] text-base font-medium leading-normal">
                       Uploading...
                     </p>
                   </div>
-                  <div className="rounded bg-[#cedbe8]">
-                    <div
-                      className="h-2 rounded bg-[#0c7ff2]"
-                      style={{ width: `${uploadProgress}%` }}
-                    ></div>
+                  {/* Spinner widget */}
+                  <div className="flex justify-center items-center my-2">
+                    <svg
+                      className="animate-spin h-10 w-10 text-[#0c7ff2]"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      ></path>
+                    </svg>
                   </div>
-                  <p className="text-[#49739c] text-sm font-normal leading-normal">
-                    {uploadProgress}% complete
-                  </p>
                 </div>
               )}
               {uploadStatus && (

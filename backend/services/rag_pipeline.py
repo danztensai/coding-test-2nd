@@ -14,13 +14,23 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 logger = logging.getLogger(__name__)
 
 PROMPT_TEMPLATE = """
-Answer the question based only on the following context:
+You are a financial reporting expert assistant. Use the following context as the primary source of information to answer the question. If necessary, you may carefully apply standard financial reasoning to interpret incomplete data, but always clearly indicate when you are inferring or estimating.
 
+Context:
 {context}
 
 ---
 
-Answer the question based on the above context: {question}
+Instructions:
+- Base your answer primarily on the provided context.
+- If you make any assumptions or interpretations, clearly state them as such.
+- Provide numeric answers with appropriate units where possible (e.g. USD, %, etc).
+- If calculations are involved, show simple calculation steps if helpful.
+- If the context lacks key data, acknowledge the limitation and suggest what additional data would be helpful.
+- Keep your tone professional, concise, and helpful.
+
+Question: {question}
+Answer:
 """
 
 class RAGPipeline:
