@@ -10,6 +10,7 @@ This project is a full-stack application using **RAG (Retrieval Augmented Genera
 
 ## Check Video for Demo
 
+#Anas di sini
 Users can upload financial statement PDFs, ask questions, and receive AI-generated answers with cited document sources.
 
 ---
