@@ -1,6 +1,7 @@
 # Handoko
 #Ini Surya yang mengubah readme di branch sendiri
 # This is my first commit in this repository - Tuntun
+# just megantara
 # Anas
 ## Overview
 
@@ -165,3 +166,8 @@ If you gonna use llama on local as your llm processing dont forget to change you
 
 
 **Build a smarter document Q&A system with RAG technology!**
+
+\#Ini Surya yang mengubah readme di branch sendiri
+
+megantara
+
