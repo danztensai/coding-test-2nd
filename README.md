@@ -2,7 +2,7 @@
 #Ini Surya yang mengubah readme di branch sendiri
 # This is my first commit in this repository - Tuntun
 # just megantara
-
+# Anas
 ## Overview
 
 This project is a full-stack application using **RAG (Retrieval Augmented Generation)** technology:
