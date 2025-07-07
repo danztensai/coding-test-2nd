@@ -1,4 +1,5 @@
 # RAG-based Financial Statement Q&A System Coding Challenge
+#Ini Surya yang mengubah readme di branch sendiri
 
 ## Overview
 
@@ -163,3 +164,6 @@ If you gonna use llama on local as your llm processing dont forget to change you
 
 
 **Build a smarter document Q&A system with RAG technology!**
+
+
+
