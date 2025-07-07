@@ -1,5 +1,6 @@
 # RAG-based Financial Statement Q&A System Coding Challenge
-#Ini adalah perubahan yang dilakukan oleh surya
+#Ini Surya yang mengubah readme di branch sendiri
+
 ## Overview
 
 This project is a full-stack application using **RAG (Retrieval Augmented Generation)** technology:
@@ -163,3 +164,6 @@ If you gonna use llama on local as your llm processing dont forget to change you
 
 
 **Build a smarter document Q&A system with RAG technology!**
+
+
+
