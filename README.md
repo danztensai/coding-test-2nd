@@ -1,5 +1,7 @@
-# RAG-based Financial Statement Q&A System Coding Challenge
-
+# Handoko
+#Ini Surya yang mengubah readme di branch sendiri
+# This is my first commit in this repository - Tuntun
+# Anas
 ## Overview
 
 This project is a full-stack application using **RAG (Retrieval Augmented Generation)** technology:
@@ -10,7 +12,6 @@ This project is a full-stack application using **RAG (Retrieval Augmented Genera
 
 ## Check Video for Demo
 
-#Anas di sini
 Users can upload financial statement PDFs, ask questions, and receive AI-generated answers with cited document sources.
 
 ---
