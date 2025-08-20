@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     pdf_upload_path: str = os.getenv("PDF_UPLOAD_PATH", "../data")
     
     # Embedding model configuration
-    embedding_model: str = os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002")
-    embedding_provider: str = os.getenv("EMBEDDING_PROVIDER", "openai")  # NEW: provider field
+    embedding_model: str = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+    embedding_provider: str = os.getenv("EMBEDDING_PROVIDER", "huggingface")  # Default to huggingface
     
     # LLM configuration
     llm_provider: str = os.getenv("LLM_PROVIDER", "ollama")
