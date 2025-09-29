@@ -71,12 +71,16 @@ def _get_optimal_device() -> str:
     Returns:
         str: Device identifier ('cuda', 'mps', or 'cpu')
     """
-    if torch.cuda.is_available():
-        return 'cuda'
-    elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-        return 'mps'
-    else:
-        return 'cpu'
+    # Force CPU usage to avoid CUDA compatibility issues
+    return 'cpu'
+    
+    # Original device detection logic (commented out due to CUDA kernel compatibility issues)
+    # if torch.cuda.is_available():
+    #     return 'cuda'
+    # elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+    #     return 'mps'
+    # else:
+    #     return 'cpu'
 
 def _get_model_config(model_name: str) -> dict:
     """

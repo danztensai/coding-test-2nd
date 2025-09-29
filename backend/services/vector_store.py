@@ -1,6 +1,6 @@
 from typing import List, Tuple
 from langchain.schema import Document
-from langchain.vectorstores.chroma import Chroma
+from langchain_community.vectorstores import Chroma
 from config import settings
 import logging
 
