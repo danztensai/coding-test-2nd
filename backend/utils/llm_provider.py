@@ -16,7 +16,7 @@ def get_llm():
     elif provider == "google":
         return ChatGoogleGenerativeAI(
             model=settings.llm_model,
-            model_provider="google_genai", #<--- This
+            # model_provider="google_genai", #<--- This
             google_api_key=settings.google_api_key
         )
     
