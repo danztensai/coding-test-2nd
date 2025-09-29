@@ -1,6 +1,7 @@
 import os
 from typing import List
 from pydantic_settings import BaseSettings
+from pydantic import field_validator
 
 class Settings(BaseSettings):
     # OpenAI API configuration
@@ -23,8 +24,12 @@ class Settings(BaseSettings):
     
     llm_model: str = os.getenv("LLM_MODEL", "llama3")
     ollama_base_url: str = os.getenv("LLAMA_SERVER_URL", "http://localhost:11434")
+    llama_server_url: str = os.getenv("LLAMA_SERVER_URL", "http://localhost:11434")
     llm_temperature: float = float(os.getenv("LLM_TEMPERATURE", "0.1"))
     max_tokens: int = int(os.getenv("MAX_TOKENS", "1000"))
+    
+    # Frontend configuration
+    next_public_backend_url: str = os.getenv("NEXT_PUBLIC_BACKEND_URL", "http://localhost:8000")
     
     # Chunking configuration
     chunk_size: int = int(os.getenv("CHUNK_SIZE", "800"))
@@ -40,10 +45,11 @@ class Settings(BaseSettings):
     debug: bool = os.getenv("DEBUG", "True").lower() == "true"
     
     # CORS configuration
-    allowed_origins: List[str] = os.getenv(
-        "ALLOWED_ORIGINS", 
-        "http://localhost:3000,http://127.0.0.1:3000"
-    ).split(",")
+    allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    
+    @property
+    def allowed_origins_list(self) -> List[str]:
+        return [origin.strip() for origin in self.allowed_origins.split(",")]
     
     # Logging configuration
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
